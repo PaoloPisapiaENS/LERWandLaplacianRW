@@ -190,8 +190,11 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
 
   while(j<conditionSize) // Runs until the Laplacian RW has covered the whole condition array
   {
-    // Reset the starting vertex
+    // Reset the starting vertex...
     v = condition[conditionSize-1]; 
+    
+    // ...and the starting rate...
+    totR = g.graph_edge(v,n); 
 
     #if PRINT==1 ||  PRINT==2
       cout << "\n From the initial vertex " << v << endl ;
@@ -233,7 +236,7 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
       
       #if PRINT==2
         else
-          cout << " We move to vertex " << k;    // We move to the new vertex k
+          cout << " We move to vertex " << k << " (probability interval: [" << totP << ", " << totP+moveP[k] << "] )";    // We move to the new vertex k
       #endif
 
       if (v==k) 
@@ -289,6 +292,7 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
           // If the intersection is at the tip FROM the growt_v, then it is a good attempt
           g_successfulAttemptsCounter++;
           g_totalAttemptsCounter--;
+          attemptsCounter--;
 
           // Store the next elements of condition[] in hash map
           mp[condition[j]] = 1;
@@ -302,7 +306,7 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
         {
           #if PRINT==1 ||  PRINT==2
             cout << "\n But it arrives from the wrong direction :(";
-            cout << "\n So let's start again the RW" << endl;
+            cout << "\n So let's start again the RW and count it as a failed attempt";
           #endif
         }
       }
@@ -310,17 +314,23 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
       {
         #if PRINT==1 ||  PRINT==2
           cout << "\n Vertex " << k << " in the trail :(";
-          cout << "\n So let's start again the RW" << endl;
+          cout << "\n So let's start again the RW without counting it as an attempt";
         #endif
       }
 
-      #if PRINT == 1   
-        cout << " (after " << attemptsCounter << " total attempts)" << endl;
+      #if PRINT == 1 ||  PRINT==2
+        cout << " (after " << attemptsCounter << " failed attempts)" << endl;
       #endif
   }
-  g_totalAttemptsCounter++;
 
+  // Finally, add the successful attempt
+  g_totalAttemptsCounter++;
+  attemptsCounter++;
   
+  #if PRINT == 1 ||  PRINT==2  
+    cout << "\n Desired Laplacian RW obtained in " << attemptsCounter << " attempts" << endl;
+  #endif
+
   /*
   #if PRINT==1
     cout << "\n\nAfter " << nSteps << " steps, the RW trail is: (";
