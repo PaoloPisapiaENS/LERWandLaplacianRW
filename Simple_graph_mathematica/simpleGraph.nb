@@ -1,0 +1,158 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 14.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      6074,        148]
+NotebookOptionsPosition[      5344,        127]
+NotebookOutlinePosition[      5993,        147]
+CellTagsIndexPosition[      5950,        144]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"Graph", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"0", "->", "1"}], ",", 
+     RowBox[{"0", "->", "2"}], ",", 
+     RowBox[{"1", "->", "3"}], ",", " ", 
+     RowBox[{"1", "->", "1"}], ",", 
+     RowBox[{"2", "->", "3"}]}], "}"}], ",", " ", 
+   RowBox[{"EdgeStyle", "->", "Green"}], ",", " ", 
+   RowBox[{"VertexLabels", "->", "\"\<Name\>\""}], ",", 
+   RowBox[{"VertexLabelStyle", "->", "Red"}], ",", " ", 
+   RowBox[{"VertexStyle", "->", "Red"}], ",", " ", 
+   RowBox[{"EdgeWeight", "->", 
+    RowBox[{"{", 
+     RowBox[{"0.9", ",", "0.9", ",", "0.9", ",", "0.9", ",", "0.9"}], 
+     "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.9374492050906506`*^9, 3.9374492935688953`*^9}, {
+  3.9374493312286873`*^9, 3.937449354560154*^9}, {3.937449402607649*^9, 
+  3.937449437251587*^9}, {3.9374495310894127`*^9, 3.9374495328724995`*^9}, {
+  3.9374497007461967`*^9, 3.937449716764189*^9}, {3.937449774666321*^9, 
+  3.937449779328722*^9}, {3.937450324315813*^9, 
+  3.9374503381138725`*^9}},ExpressionUUID->"c86cee81-3c56-9e4b-bc04-\
+8c350c9b6d39"],
+
+Cell[BoxData[
+ GraphicsBox[
+  NamespaceBox["NetworkGraphics",
+   DynamicModuleBox[{Typeset`graph = HoldComplete[
+     Graph[{0, 1, 2, 3}, {{{1, 2}, {1, 3}, {2, 4}, {2, 2}, {3, 4}}, Null}, {
+      EdgeStyle -> {
+         RGBColor[0, 1, 0]}, VertexLabels -> {"Name"}, VertexLabelStyle -> {
+         RGBColor[1, 0, 0]}, VertexStyle -> {
+         RGBColor[1, 0, 0]}, EdgeWeight -> {0.9, 0.9, 0.9, 0.9, 0.9}}]]}, 
+    TagBox[GraphicsGroupBox[{
+       {RGBColor[0, 1, 0], Opacity[0.7], Arrowheads[Medium], 
+        ArrowBox[{{0., 2.}, {0., 1.}}, 0.02261146496815286], 
+        ArrowBox[{{0., 2.}, {1., 1.}}, 0.02261146496815286], 
+        ArrowBox[{{0., 1.}, {0., 0.}}, 0.02261146496815286], 
+        ArrowBox[
+         BezierCurveBox[{{0., 1.}, {0.17456440273889778`, 
+          1.2640079557720372`}, {0.3979657659306106, 1.2864137795681228`}, {
+          0.5279347679415438, 1.208039588252139}, {0.5279347679415439, 
+          0.791960411747861}, {0.39796576593061056`, 0.7135862204318772}, {
+          0.17456440273889778`, 0.7359920442279628}, {0., 1.}},
+          SplineDegree->7], 0.02261146496815286], 
+        ArrowBox[{{1., 1.}, {0., 0.}}, 0.02261146496815286]}, 
+       {RGBColor[1, 0, 0], EdgeForm[{GrayLevel[0], Opacity[
+        0.7]}], {DiskBox[{0., 2.}, 0.02261146496815286], InsetBox[
+          StyleBox["0",
+           StripOnInput->False,
+           LineColor->RGBColor[1, 0, 0],
+           FrontFaceColor->RGBColor[1, 0, 0],
+           BackFaceColor->RGBColor[1, 0, 0],
+           GraphicsColor->RGBColor[1, 0, 0],
+           FontColor->RGBColor[1, 0, 0]], 
+          Offset[{2, 2}, {0.02261146496815286, 2.022611464968153}], 
+          ImageScaled[{0, 0}],
+          BaseStyle->"Graphics"]}, {DiskBox[{0., 1.}, 0.02261146496815286], 
+         InsetBox[
+          StyleBox["1",
+           StripOnInput->False,
+           LineColor->RGBColor[1, 0, 0],
+           FrontFaceColor->RGBColor[1, 0, 0],
+           BackFaceColor->RGBColor[1, 0, 0],
+           GraphicsColor->RGBColor[1, 0, 0],
+           FontColor->RGBColor[1, 0, 0]], 
+          Offset[{2, 2}, {0.02261146496815286, 1.0226114649681528}], 
+          ImageScaled[{0, 0}],
+          BaseStyle->"Graphics"]}, {DiskBox[{1., 1.}, 0.02261146496815286], 
+         InsetBox[
+          StyleBox["2",
+           StripOnInput->False,
+           LineColor->RGBColor[1, 0, 0],
+           FrontFaceColor->RGBColor[1, 0, 0],
+           BackFaceColor->RGBColor[1, 0, 0],
+           GraphicsColor->RGBColor[1, 0, 0],
+           FontColor->RGBColor[1, 0, 0]], 
+          Offset[{2, 2}, {1.0226114649681528, 1.0226114649681528}], 
+          ImageScaled[{0, 0}],
+          BaseStyle->"Graphics"]}, {DiskBox[{0., 0.}, 0.02261146496815286], 
+         InsetBox[
+          StyleBox["3",
+           StripOnInput->False,
+           LineColor->RGBColor[1, 0, 0],
+           FrontFaceColor->RGBColor[1, 0, 0],
+           BackFaceColor->RGBColor[1, 0, 0],
+           GraphicsColor->RGBColor[1, 0, 0],
+           FontColor->RGBColor[1, 0, 0]], 
+          Offset[{2, 2}, {0.02261146496815286, 0.02261146496815286}], 
+          ImageScaled[{0, 0}],
+          BaseStyle->"Graphics"]}}}],
+     MouseAppearanceTag["NetworkGraphics"]],
+    AllowKernelInitialization->False]],
+  DefaultBaseStyle->"NetworkGraphics",
+  FormatType->TraditionalForm,
+  FrameTicks->None]], "Output",
+ CellChangeTimes->{{3.937449259900526*^9, 3.9374492939336243`*^9}, {
+   3.9374493354498005`*^9, 3.93744935511022*^9}, {3.9374494126812363`*^9, 
+   3.937449437669071*^9}, 3.9374495332824135`*^9, {3.937449707561882*^9, 
+   3.9374497171820946`*^9}, 3.9374497798034153`*^9},
+ CellLabel->"Out[12]=",ExpressionUUID->"abbe69f5-9a01-d74a-80f6-bfa09abef3e9"]
+}, Open  ]]
+},
+WindowSize->{1152, 579.6},
+WindowMargins->{{
+  Automatic, -5.399999999999864}, {-5.399999999999977, Automatic}},
+Magnification:>1.3 Inherited,
+FrontEndVersion->"14.0 for Microsoft Windows (64-bit) (December 12, 2023)",
+StyleDefinitions->FrontEnd`FileName[{$RootDirectory, "C:", "Users", "paolo", 
+   "AppData", "Roaming", "Mathematica", "SystemFiles", "FrontEnd", 
+   "StyleSheets"}, "DarkMode.nb", CharacterEncoding -> "UTF-8"],
+ExpressionUUID->"bd194e3c-a489-cd45-801b-bf678e0e8e62"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 1082, 24, 62, "Input",ExpressionUUID->"c86cee81-3c56-9e4b-bc04-8c350c9b6d39"],
+Cell[1665, 48, 3663, 76, 583, "Output",ExpressionUUID->"abbe69f5-9a01-d74a-80f6-bfa09abef3e9"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
