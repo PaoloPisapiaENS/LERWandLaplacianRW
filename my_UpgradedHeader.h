@@ -15,9 +15,10 @@
 #include <iomanip>
 #include <cmath>
 #include <fstream>
-#include <ctime>         // To use time(NULL) as the seed in the pseudo-random number generator
-#include <cstdlib>       // To use random numbers
-#include <vector>
+#include <ctime>          // To use time(NULL) as the seed in the pseudo-random number generator
+#include <cstdlib>        // To use random numbers
+#include <vector>         // To use vectors
+#include <algorithm>      // To use find() for vectors
 #include <bits/stdc++.h>  // To use hashing maps
 #include <map>            // To use hashing maps (ordered)
 

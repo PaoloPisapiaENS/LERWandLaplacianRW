@@ -23,19 +23,6 @@ void LaplacianRandomWalk( Graph  /*Provide a graph to run the random walk on*/,
                           int    /*as well as its size*/,
                           int  nSteps=1e6  /*(OPTIONAL) the number of steps (just to make sure the loop ends)*/);
 
-#if PRINT == -1
-
-void RandomWalk( Graph /*Provide a graph to run the random walk on*/,
-                int*   /*Provide a pointer to an array to store the trail of the RW*/,
-                int    /*as well as its dimension, i.e. the number of steps*/,
-                int v=0   /*(OPTIONAL)Provide the starting vertex*/);
-
-int LaplacianRW(  Graph  /*Provide a graph to run the random walk on*/,
-                  int   /*Provide the number of steps desired for the RW*/,
-                  int*  /*Provide the array containing the desired trail of the Laplacian RW*/,
-                  int /*as well as its size*/);
-#endif
-
 bool checkArrays(int* /*Provide a pointer to an array*/, 
                  int* /*Provide a pointer to a second array*/,
                  int  /*Size of arr1*/,
@@ -57,9 +44,14 @@ int main()
 
   srand48(time(NULL)); // Initialize the sequence
 
+  // We want to compute a mean of the probabilities, so we need a variable to store the numbers of runs
+  int nRun = 10;
+
+  // Variable to store the partial sum of the probabilities to compute their mean
+  double partProbSum = 0.;
 
   // Number of iterations
-  int N= 1e6;
+  int N= 2e6;
 
   // Typical dimension of the graph
   int nbase=3;
@@ -71,13 +63,8 @@ int main()
   double q = 0;
 
   // Define the condition, i.e. what Laplacian RW we want
-  int condition[] = {0,1,4};
+  int condition[] = {0,1,4,7,8};
 
-  // Define the desired length of the RW:
-  //int nSteps = 250;        // First its size (actually its size-1)
-
-  // Define the variable that store the number of total attempts
-  //int totAttempts = 0;
 
   ///////////////////////////////////////////////////////////////////
 
@@ -97,31 +84,44 @@ int main()
   // Retreive the graph dimension
   int n=g.graph_size();
 
-  //cout << "Size of the graph: " << n << endl;
-
-  for(int i=0; i<N; i++)
+  // Compute the mean of the probabilities
+  for (int j = 0; j < nRun; j++)
   {
-    LaplacianRandomWalk(g, condition, sizeof(condition)/sizeof(condition[0]) );
+    for(int i=0; i<N; i++)
+    {
+      LaplacianRandomWalk(g, condition, sizeof(condition)/sizeof(condition[0]) );
 
-    #if PRINT==1 ||  PRINT==2
-    cout << "\n******************************************************" << endl;
-    #endif
+      #if PRINT==1 ||  PRINT==2
+      cout << "\n******************************************************" << endl;
+      #endif
 
-  /*#if PRINT==1
-    // Print the LERW
-    cout << "\n->LERW: (";
+    /*#if PRINT==1
+      // Print the LERW
+      cout << "\n->LERW: (";
 
-    for(int i=0; i<(SizeLERW-1); i++)
-      cout << LERW[i] << ", ";
+      for(int i=0; i<(SizeLERW-1); i++)
+        cout << LERW[i] << ", ";
 
-    cout << LERW[SizeLERW-1] << ")" << endl;
-  #endif*/
+      cout << LERW[SizeLERW-1] << ")" << endl;
+    #endif*/
+    }
 
+    partProbSum += (double) g_successfulAttemptsCounter/(g_totalAttemptsCounter);
+
+    // Print out the numebr of correct LERW
+    /*cout << "\n Out of the " << N << " attempts, we have obtained " << g_totalAttemptsCounter << " Laplacian RWs,"
+        << " of which " << g_successfulAttemptsCounter << " are the desired ones" 
+        << ", so the probability is " << (double) g_successfulAttemptsCounter/(g_totalAttemptsCounter) *100 <<  "%" << endl;
+    */
+    g_successfulAttemptsCounter = 0;
+    g_totalAttemptsCounter = 0;
   }
-
-  // Print out the numebr of correct LERW
-  cout << "\n We have obtained " << N << " Laplacian RWs, in a total of " << g_totalAttemptsCounter << " attempts" 
-       << ", so the probability is " << (double) N/(g_totalAttemptsCounter) *100 <<  "%" << endl;
+  
+  // Print out the numeber of correct Laplacian RW
+  cout << "\n In " << nRun << " runs of " << N << " attempts each, the mean probability to get the Laplacian RW (" << condition[0] << ", ";
+  for (int i = 1; i < sizeof(condition)/sizeof(condition[0]) -1 ; i++)
+    cout << condition[i] << ", " ;
+  cout << condition[sizeof(condition)/sizeof(condition[0]) -1] << ") is " << partProbSum/nRun * 100 << "%" << endl;
 
   return 0;
 
@@ -161,7 +161,7 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
 
   // Buffer for the probability to move towards a specific vertex
   double* moveP = new double[n];
-  // And set an index variable
+  // And set its index variable
   int k = 0;
 
   // Start by storing the first vertex in the array 'trail'. It will be useful to then performe the loop erasure. 
@@ -172,23 +172,16 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
   
   // Define the growth vertex buffer, where the position of the Laplacian RW is at a given moment, initialized as the first vertex of the condition array
   int tip = condition[j];  
-  
-  // Define also the growth vertex, where the condition wants the Laplacian RW to growt to. If the RW arrives here without arriving at a point in the past first, then the point is added to the Laplacian RW
-  int growth_v = condition[++j];
 
   // Define a local attempt counter
   int attemptsCounter = 0;
 
-  // Index of the first (possible) intersection
-  //int intersect;
-
-  // Store the first elements of condition[] in hash map
+  // Create a map where the Laplacian RW will be stored. Start by adding the initial point, which must be the 'tip'
   unordered_map<int, bool> mp;
-  
-  mp[condition[0]] = 1;
 
+  mp[tip] = 1;
 
-  while(j<conditionSize) // Runs until the Laplacian RW has covered the whole condition array
+  while(mp.find(condition[conditionSize-1]) == mp.end()) // Runs until the Laplacian RW reaches the source
   {
     // Reset the starting vertex...
     v = condition[conditionSize-1]; 
@@ -268,48 +261,28 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
       }
       // If instead k is present, i.e. the RW hit the trail of the Laplacian RW, report it by return it braking the loop
       else
-        goto jump;
+        goto jump1;
     }
       
     // Check if there is any intersection between the trail and the condition. intersactionArrays provides the first intersection
     //intersect = intersectArrays( condition, trail, j, nSteps);
 
     // If we jump here is because we hit the trail of the Laplacian RW. 
-    jump:
-      // Check if k is at the tip, and count it as an attempt(we want a CONDITIONED PROBABILITY!!). 
-      // But if it hits FROM the growt_v, then it is good, and so remove it from the count and upgrade the variables. 
+    jump1:
+      // Check if k is at the tip, and if so add the last step to the Laplacian RW
       if (k == tip)
       {
         #if PRINT==1 ||  PRINT==2
           cout << "\n Vertex " << k << " is the tip!!";
         #endif
 
-        g_totalAttemptsCounter++;
-        attemptsCounter++;
+        // Store the previous vertex in the map
+        mp[v] = 1;
 
-        if ( v == growth_v )
-        {
-          // If the intersection is at the tip FROM the growt_v, then it is a good attempt
-          g_successfulAttemptsCounter++;
-          g_totalAttemptsCounter--;
-          attemptsCounter--;
-
-          // Store the next elements of condition[] in hash map
-          mp[condition[j]] = 1;
-          
-          //And update the growth_v and tip and advances the index over the condition array
-          j++;
-          tip = growth_v;
-          if(j<conditionSize) growth_v = condition[j];
-        }
-        else
-        {
-          #if PRINT==1 ||  PRINT==2
-            cout << "\n But it arrives from the wrong direction :(";
-            cout << "\n So let's start again the RW and count it as a failed attempt";
-          #endif
-        }
+        // And update the 'tip'        
+        tip = v;
       }
+      // Else, if it has hit a part of the trail, simply do the RW again
       else
       {
         #if PRINT==1 ||  PRINT==2
@@ -323,9 +296,26 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
       #endif
   }
 
-  // Finally, add the successful attempt
-  g_totalAttemptsCounter++;
-  attemptsCounter++;
+  // Finally, check if the trail is the same as the condition: first check their size...
+  if (conditionSize == mp.size())
+  {
+    // ...then check whether all the elements of condition[] are in the Laplacian RW just created
+    for(int i=0; i<conditionSize; i++ )
+    {
+      // If the element 'i' is not found, break the 'for' and go directly to the total attempt counter increment
+      if(mp.find(condition[i]) == mp.end()) 
+      {
+        goto jump2;
+      }
+    }
+
+    // Otherwise, if all the elemnts are present, count it as a succesful attempt      
+    g_successfulAttemptsCounter++;
+  }
+
+  jump2:
+    g_totalAttemptsCounter++;
+
   
   #if PRINT == 1 ||  PRINT==2  
     cout << "\n Desired Laplacian RW obtained in " << attemptsCounter << " attempts" << endl;
@@ -345,124 +335,6 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
 
 } // End of function LaplacianRandomWalk
 
-#if PRINT == -1
-// Now we define a loopErasing function
-int LaplacianRW(  Graph g /*Provide a graph to run the random walk on*/,
-                  int  nSteps /*Provide the number of steps desired for the RW*/,
-                  int* condition /*Provide the array containing the desired trail of the Laplacian RW*/,
-                  int conditionSize    /*as well as its size*/)
-{
-  // Define the index that will run on the condition array 
-  int j=0;
-  // Define the growth vertex buffer, where the position of the Laplacian RW is at a given moment, initialized as the first vertex of the condition array
-   int tip = condition[j];  
-  // Define also the growth vertex, where the condition wants the Laplacian RW to growt to. If the RW arrives here without arriving at a point in the past first, then the point is added to the Laplacian RW
-  int growth_v = condition[++j];
-
-  // Counter for the total number of attempts 
-  int attemptsCounter = 0;
-
-  // Index of the first (possible) intersection
-  int intersect;
-
-  // Define the Trail array, where the RW trail will be stored
-  int *trail = new int[nSteps+1];
-
-  while(j<conditionSize) // Runs until the Laplacian RW has covered the whole condition array
-  {
-    // Run a RW from the end vertex
-    RandomWalk(g, trail, nSteps, condition[conditionSize-1]);
-    
-    // Check if there is any intersection between the trail and the condition. intersactionArrays provides the first intersection
-    intersect = intersectArrays( condition, trail, j, nSteps);
-
-    // If the intersection is at the tip, count it as an attempt(we want a CONDITIONED PROBABILITY!!). 
-    // But if it hits FROM the growt_v, then it is good, and so remove it from the count and upgrade the variables. If there is no intersection, just generate a new RW
-    if (trail[intersect] == tip)
-    {
-      attemptsCounter++;
-
-      if ( trail[intersect-1] == growth_v )
-      {
-        // If the intersection is at the tip FROM the growt_v, then it is a good attempt, and we will only count it at the end. So remove it for now from the counter
-        attemptsCounter--;
-        
-        //And update the growth_v and tip and advances the index over the condition array
-        j++;
-        tip = growth_v;
-        if(j<conditionSize) growth_v = condition[j];
-      }
-    }
-    
-    /*
-    // Now check if the RW hits the tip and growth vertex of the Laplacian RW, and if so, also check if it did not hit a piece of the Laplacian RW already there 
-    for(int i=1; i<=nSteps; i++ )
-    {
-      if( trail[i] == tip )
-      {
-        #if PRINT == 1
-          cout << "\n Tip hit!";
-        #endif
-
-        //////////////////////////////////////////////
-        // DOUBLE CHECK THAT THE COUNTING IS RIGHT  //
-        //////////////////////////////////////////////
-
-
-        if( intersect== true )
-        {
-          #if PRINT == 1
-            cout << " However, it hit the trail before :( ";
-          #endif
-          attemptsCounter++;
-          //attemptsCounter--;
-        }
-
-        else if(trail[i-1] == growth_v)
-        {       
-          #if PRINT == 1   
-            cout << "\n Vertex number " << tip << " succesfully hit coming from " << growth_v;
-          #endif
-
-          // Updates the growth_v and tip and advances the index over the condition array
-          j++;
-          tip = growth_v;
-          if(j<conditionSize) growth_v = condition[j];
-        }
-
-        else
-        {
-          #if PRINT == 1   
-            cout << "\n But a vertex in the trail of the Laplacian RW was hit :(";
-          #endif
-          attemptsCounter++;
-        }
-
-        break;
-      }    
-    }*/
-
-    
-    #if PRINT == 1   
-      cout << " (after " << attemptsCounter << " total attempts)" << endl;
-    #endif
-  }
-  attemptsCounter++;
-
-  delete[] trail;
-
-  // Finally returns the total number of attempt to get that Laplacian RW //as (no.attempts - (lenght of the Laplacian RW-1) because we need at least a number equal to (lenght of the Laplacian RW)+1 of attempts
-
-  #if PRINT == 1   
-    cout << "\n We get the desired Laplacian RW after: " << (attemptsCounter - (conditionSize-1)) << " attempts" << endl
-        << "*****************************************************************************************" << endl; 
-  #endif
-
-  return (attemptsCounter);// - (conditionSize-1));
-
-} // End of function LaplacianRW 
-
-#endif
 
 // A function to check whether two arrays are equal
 bool checkArrays(int * arr1, int * arr2, 
