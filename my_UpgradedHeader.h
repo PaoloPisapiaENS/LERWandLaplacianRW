@@ -169,12 +169,12 @@ Graph RegularGraph( int nbase /*number verteces in each row*/,
 
   else if(v==6)
   {
-    cout << "\nHoneycomb lattice TO BE UPDATED" << endl;
+    cout << "\nHoneycomb lattice " << n << "x" << n << endl;
 
     for(int i=0; i<n*n; i++)
     {
       for(int j=i+1;j<n*n; j++)
-       g.add_edge(i,j,undirected, weight * ( DELTA(i,(j-1)) * DELTA((i/n),(j/n)) * ( DELTA( ((n + i + i/n)%2), 0) + DELTA( ((n )%2), 1) * DELTA( ((i )%2), 0) ) + DELTA(i,(j+n)) + DELTA(i,(j-n))) );
+       g.add_edge(i,j,undirected, weight * ( DELTA((i/n),(j/n)) * ( DELTA(i,(j+1)) + DELTA(i,(j-1)) ) * ( DELTA((n%2), 0 ) * (DELTA( ((i+i/n)%2),0)) + DELTA((n%2), 1 ) * (DELTA((i%2),0)))/*on the same rows, if next-neighbours: if n is odd, then all the even verteces; if n is even then all the odd verteces on odd rows or even veretces on even rows*/ + (DELTA(i,(j+n)) + DELTA(i,(j-n)))/*i.e. all the vertex on the same column*/) );
       
       g.total_rate_vertex(i);
     }
