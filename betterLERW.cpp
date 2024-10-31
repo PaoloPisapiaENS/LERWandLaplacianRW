@@ -21,12 +21,6 @@ void LoopErasedRandomWalk( Graph  /*Provide a graph to run the random walk on*/,
                           int    /*as well as its size*/,
                           int  nSteps=1e6  /*(OPTIONAL) the number of steps (just to make sure the loop ends)*/);
 
-bool checkArrays(int* /*Provide a pointer to an array*/, 
-                 int* /*Provide a pointer to a second array*/,
-                 int  /*Size of arr1*/,
-                 int  /*Size of arr2*/);
-
-
 ////////////////////////////////////////////
 //                MAIN                    //
 ////////////////////////////////////////////
@@ -39,7 +33,7 @@ int main()
   srand(time(NULL)); // Initialize the sequence
 
   // We want to compute a mean of the probabilities, so we need a variable to store the numbers of runs
-  int nRun = 10;
+  int nRun = 1;
 
   // Variable to store the partial sum of the probabilities to compute their mean
   double partProbSum = 0.;
@@ -48,16 +42,16 @@ int main()
   int N= 2e6;
 
   // Typical dimension of the graph
-  int nbase=3;
+  int nbase=4;
 
   // Shape of the tiles (4=square)
-  int v=4;
+  int v=6;
 
   // Absorption weight
   double q = 0;
 
   // Define the condition, i.e. what LERW we want
-  int condition[] = {0,1,4,7,8};
+  int condition[] = {0,1,5,6};
 
 ///////////////////////////////////////////////////////////////////
 
@@ -157,11 +151,6 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
   // Define an iterator variable. It will run on the map and assign the new entries as it goes
   auto it=mp.begin(); 
 
-  /*// Define also a variable that will carry the iterator and the boolean yielded by insert() (the return value of insert() is std::pair<iterator, bool>) 
-  auto insertResult = mp.insert(make_pair(v, 1));
-
-  it = insertResult.first;*/
-
   
   #if PRINT==1 ||  PRINT==2
     cout << "\n From the initial vertex " << v << ", we want to arrive at vertex " << end << endl ;
@@ -179,7 +168,7 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
     for ( int i=0; i<n; i++)
       moveP[i] = g.graph_edge(v,i)/totR;  
 
-    // Now it initializes the random variable and assign the running index 'j' to start from the end (the last vertex is the absorption one)
+    // Now it initializes the random variable and assign the running index 'k' to start from the end (the last vertex is the absorption one)
     x = drand48();   // Assign a random variable
     k = n;           // Assign the index to start from the end (the last vertex is the absorption one)
 
@@ -187,7 +176,7 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
       cout << "\n(The random number is: " << x << ")" << endl ;
     #endif
 
-    // This loop checks in which probability range one finds itself: when it breaks out, the index j represents the edge one moves to
+    // This loop checks in which probability range one finds itself: when it breaks out, the index k represents the edge one moves to
     while ( x<= totP)               
     {
       k--;
@@ -214,25 +203,6 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
         cout << "\nA SELF-LOOP!!\n";
       #endif
     }
-
-    /*
-    // Now, try to add the new vertex k to the map
-    insertResult = mp.insert(make_pair(k, 1));
-
-    // The variable insertResult contains 
-    // 1)an iterator to the position of the inserted or found vertex, depending on whether the vertex was already present or not; 
-
-    it = insertResult.first;
-
-    // 2) a boolean indicating whether the insert was successful (true) or not (false).
-
-    // We could check if the insertion happened or not. In our problem, this translates to the formation of a loop, that we will erase. However we erase the elements of the map starting from the position AFTER/FOLLOWING that of 'it'. In this way we keep the first time we visited the vertex of the loop. Also, the insertion went through, the iterator points to the last element, and therefore by increasing it by one we get it==mp.end(), which skips the 'for' loop
-    */
-
-    /*for (; it != mp.end(); it++)
-    {
-      mp.erase(it->first);
-    }*/
 
     // Search for the element k and store its position into the iterator 'it'
     it = find(mp.begin(), mp.end(), k);
@@ -269,9 +239,6 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
     for(auto itr : mp)
       cout << itr << ", ";
     cout << ")" << endl;
-
-    /*++it;
-    cout << it->first << ")" << endl;*/
   #endif
 
   // Finally, check if the trail is the same as the condition: first check their size...
@@ -297,62 +264,3 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
   delete[] moveP;
 
 } // End of function LoopErasedRandomWalk
-
-
-// A function to check whether two arrays are equal
-bool checkArrays(int * arr1, int * arr2, 
-                 int n /*Size of arr1*/, 
-                 int m /*Size of arr2*/)
-{
-  // Store arr1[] elements and their frequencies in hash map
-  unordered_map<int, int> mp;
-  for (int i = 0; i < n; i++)
-    mp[arr1[i]]++;
-
-  // Check if the last element of arr2[] is not the same as that of arr1[]
-  if (arr2[m-1] != arr1[n-1])
-  {
-    #if PRINT == 1
-      cout << "\n Not arrived at the correct end-point :(" << endl;
-    #endif
-
-    return false;
-  }
-  
-  // If lengths of arrays are not equal
-  if (n != m)
-  {
-    #if PRINT == 1
-      cout << "\n Wrong path :( " << endl;
-    #endif
-
-    return false;
-  }
-
-  // Traverse arr2[] elements and check if all elements of arr2[] are present in the same number of times or not.
-  for (int i = 0; i < n-1; i++) 
-  {
-    // If there is an element in arr2[], but not in arr1[]
-    if (mp.find(arr2[i]) == mp.end())
-    {
-      #if PRINT == 1
-        cout << "\n Wrong path :( " << endl;
-      #endif
-
-      return false;
-    }
-
-    // If an element of arr2[] appears more times than it appears in arr1[]
-    if (mp[arr2[i]] == 0)
-      return false;
-
-    // Decrease the count of arr2 elements in the unordered map
-    mp[arr2[i]]--;
-  }
-
-  #if PRINT == 1
-      cout << "\n Correct path! :) " << endl;
-  #endif
-
-  return true;
-} // End of function checkArrays

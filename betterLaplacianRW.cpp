@@ -23,17 +23,6 @@ void LaplacianRandomWalk( Graph  /*Provide a graph to run the random walk on*/,
                           int    /*as well as its size*/,
                           int  nSteps=1e6  /*(OPTIONAL) the number of steps (just to make sure the loop ends)*/);
 
-bool checkArrays(int* /*Provide a pointer to an array*/, 
-                 int* /*Provide a pointer to a second array*/,
-                 int  /*Size of arr1*/,
-                 int  /*Size of arr2*/);
-
-int intersectArrays(int * /*Provide a pointer to an array*/, 
-                     int* /*Provide a pointer to a second array*/, 
-                     int /*Size of arr1*/,  
-                     int /*Size of arr2*/);
-
-
 ////////////////////////////////////////////
 //                MAIN                    //
 ////////////////////////////////////////////
@@ -45,13 +34,13 @@ int main()
   srand48(time(NULL)); // Initialize the sequence
 
   // We want to compute a mean of the probabilities, so we need a variable to store the numbers of runs
-  int nRun = 10;
+  int nRun = 1;
 
   // Variable to store the partial sum of the probabilities to compute their mean
   double partProbSum = 0.;
 
   // Number of iterations
-  int N= 2e6;
+  int N= 1e6;
 
   // Typical dimension of the graph
   int nbase=3;
@@ -264,8 +253,6 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
         goto jump1;
     }
       
-    // Check if there is any intersection between the trail and the condition. intersactionArrays provides the first intersection
-    //intersect = intersectArrays( condition, trail, j, nSteps);
 
     // If we jump here is because we hit the trail of the Laplacian RW. 
     jump1:
@@ -334,65 +321,3 @@ void LaplacianRandomWalk( Graph g /*Provide a graph to run the random walk on*/,
   delete[] moveP;
 
 } // End of function LaplacianRandomWalk
-
-
-// A function to check whether two arrays are equal
-bool checkArrays(int * arr1, int * arr2, 
-                 int /*Size of arr1*/ n, 
-                 int m /*Size of arr2*/)
-{
-  // If lengths of arrays are not equal
-  if (n != m)
-  {
-    g_notArrivedCounter++;
-    return false;
-  }
-  
-
-  // Store arr1[] elements and their frequencies in hash map
-  unordered_map<int, int> mp;
-  for (int i = 0; i < n; i++)
-    mp[arr1[i]]++;
-
-  // Traverse arr2[] elements and check if all elements of arr2[] are present in the same number of times or not.
-  for (int i = 0; i < n; i++) 
-  {
-    // If there is an element in arr2[], but not in arr1[]
-    if (mp.find(arr2[i]) == mp.end())
-      return false;
-
-    // If an element of arr2[] appears more times than it appears in arr1[]
-    if (mp[arr2[i]] == 0)
-      return false;
-
-    // Decrease the count of arr2 elements in the unordered map
-    mp[arr2[i]]--;
-  }
-
-  return true;
-} // End of function checkArrays
-
-// A function to check whether two arrays intersect, i.e. have elements in common 
-int intersectArrays(int * arr1, int * arr2, 
-                 /*Size of arr1*/ int n,  
-                 int m /*Size of arr2*/)
-{
-  // Store arr1[] elements in hash map
-  unordered_map<int, bool> mp;
-
-  for (int i = 0; i < n; i++)
-    mp[arr1[i]] = 1;
-
-  // Traverse arr2[] elements and check if any element of arr2[] is also present in arr1[]
-  for (int i = 0; i < m; i++) 
-  {
-    // If the element of arr2[] is not present, good, go ahed with the check
-    if (mp.find(arr2[i]) == mp.end());
-    // If instead the element is present, report it by return it 
-    else
-      return i;
-  }
-
-  // If no element of arr2[] was found in arr1[], then return -1, which in this circumstance means FALSE 
-  return -1;
-} // End of function checkArraysSoft
