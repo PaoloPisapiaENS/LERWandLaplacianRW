@@ -7,6 +7,7 @@
 // Include a header file containing all the necessary libraries and function prototypes
 #include "/mnt/d/Offline_Documents/University/PhD_Paris/PhD_work/Simulations/Simple_Graph/my_UpgradedHeader.h" 
 
+#undef PRINT 
 #define PRINT 0 // 1: print everything exept for the RW steps; 2: print everything; 0: don't print anything
 
 // Counters for the total number of attempts 
@@ -40,19 +41,13 @@ int main()
   double partProbSum = 0.;
 
   // Number of iterations of the LoopErasedRandomWalk function
-  int N= 2e6;
-
-  // Typical dimension of the graph
-  int nbase=4;
-
-  // Shape of the tiles (4=square)
-  int v=6;
+  int N= 1e6;
 
   // Absorption weight
-  double q = 0;
+  double q = 1;
 
   // Define the condition, i.e. what LERW we want
-  int condition[] = {0,1,5,6};
+  int condition[] = {0,1};
 
 ///////////////////////////////////////////////////////////////////
 
@@ -65,7 +60,21 @@ int main()
     cout << condition[i] << ", " ;
   cout << condition[sizeof(condition)/sizeof(condition[0]) -1] << ")" << endl;
 
-  Graph g=RegularGraph(nbase,v, q);
+  // The simple graph only contains two vertices plus a third absorption vertex
+  Graph g(3);
+
+  // Now add the weights between the vertices. For simplicity, set the all to 1
+  g.add_edge(0,1,true);
+  g.add_edge(0,2,false,q);
+  g.add_edge(1,2,false,q);
+
+  // Print the graph adjacency matrix
+  g.print();
+
+  // Compute the total rate for each vertex
+  g.total_rate_vertex(0);
+  g.total_rate_vertex(1);
+  g.total_rate_vertex(2);
 
   // Retreive the graph dimension
   int n=g.graph_size();
@@ -85,6 +94,7 @@ int main()
 
     partProbSum += (double) g_successfulAttemptsCounter/(g_totalAttemptsCounter);
 
+    
     // Reset the counters
     g_successfulAttemptsCounter = 0;
     g_totalAttemptsCounter = 0;
@@ -154,7 +164,7 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
   #endif 
 
   
-  while(find(mp.begin(), mp.end(), end) == mp.end() && totR * nStepsLeft !=0) // Runs until the LERW reaches the end point
+  while( totR * nStepsLeft !=0) // Runs until the LERW reaches the end point
   //OR we can no longer move from a vertex, i.e. when its not connected to any other vertex (and hence the total rate is zero), e.g. when it gets absorbed, 
   // OR when it has performed all the steps
   {
@@ -180,7 +190,7 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
       totP -= moveP[k];
     }
     
-    if(g.total_rate_vertex(k)==0)        // i.e. if it gets absorbed (the absorption vertex is the last one)
+    if(g.graph_edge(k,n)==0)        // i.e. if it gets absorbed (the n-th column contains the total rate. only the total rate of the absorption vertex is zero)
     {
       g_absorptionCounter++;
     
@@ -189,36 +199,37 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
       #endif
     }
     
-    #if PRINT==2
-      else
-        cout << "We move to vertex " << k << " (probability interval: [" << totP << ", " << totP+moveP[k] << "] )";    // We move to the new vertex j
-    #endif
-
-    if (v==k) 
+    else
     {
-      
       #if PRINT==2
-        cout << "\nA SELF-LOOP!!\n";
+          cout << "We move to vertex " << k << " (probability interval: [" << totP << ", " << totP+moveP[k] << "] )";    // We move to the new vertex j
+      #endif
+
+      if (v==k) 
+      {
+        
+        #if PRINT==2
+          cout << "\nA SELF-LOOP!!\n";
+        #endif
+      }
+
+      // Search for the element k and store its position into the iterator 'it'
+      it = find(mp.begin(), mp.end(), k);
+
+      // Now erase from position 'it' till the end. If k was not present (and therefore it=mp.end()), this erases nothing. If it was present, then erase all the elements following k (k included)   
+      mp.erase(it, mp.end() );
+
+      // Then insert it at the end
+      mp.insert(mp.end(), k);
+
+      #if PRINT==2
+        cout << "\n After erasure (";
+
+        for(auto itr : mp)
+          cout << itr << ", ";
+        cout << ")" << endl;
       #endif
     }
-
-    // Search for the element k and store its position into the iterator 'it'
-    it = find(mp.begin(), mp.end(), k);
-
-    // Now erase from position 'it' till the end. If k was not present (and therefore it=mp.end()), this erases nothing. If it was present, then erase all the elements following k (k included)   
-    mp.erase(it, mp.end() );
-
-    // Then insert it at the end
-    mp.insert(mp.end(), k);
-
-    #if PRINT==2
-      cout << "\n After erasure (";
-
-      for(auto itr : mp)
-        cout << itr << ", ";
-      cout << ")" << endl;
-    #endif
-
     // Finally, we can move on with the RW, so reduce the number of steps left..
     nStepsLeft--;
 
@@ -254,6 +265,7 @@ void LoopErasedRandomWalk( Graph g /*Provide a graph to run the random walk on*/
 
     // Otherwise, if all the elements are present, count it as a succesful attempt      
     g_successfulAttemptsCounter++;
+    g_absorptionCounter--;
   }
 
   jump2:
