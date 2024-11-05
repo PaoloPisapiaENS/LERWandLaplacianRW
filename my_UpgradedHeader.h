@@ -38,9 +38,11 @@ public:
     // Constructor to initialize the graph with 'n' vertices
     Graph(int n)
     {
-        adj_matrix
-            = vector<vector<double> >(n, vector<double>(n+1, 0));       // NB: we have added an extra column which will contain the sum of all rates in each row. This will come in handy as it allows
-                                                                        // us to retreive this information much more quickly
+      adj_matrix
+          = vector<vector<double> >(n, vector<double>(n+1, 0));       // NB: we have added an extra column which will contain the sum of all rates in each row. This will come in handy as it allows
+                                                                      // us to retreive this information much more quickly
+      
+        cout << "\n REMEMBER TO ADD ALL THE WEIGHTS AND TO COMPUTE THE TOTAL WEIGHTS IN THE GRAPH " << endl << endl; 
     }
 
     // Function to add an edge between vertices 'u' and 'v' of the graph using a weight 'w' ('u' and 'v' could be the same vertex, which means that a self loop is allowed). If 'undirected' is true, then it is an undirected graph, and the edge going backwards is filled as well (with the same weight. If another weight is in order, one has to consider it as a directed graph and manually insert the new backward weight)
